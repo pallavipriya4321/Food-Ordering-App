@@ -1,11 +1,10 @@
 import Card from "./Card";
 import { useEffect, useState } from "react";
 import { API_URL, RESTURANTS } from "../utils/constants";
-import InfoCard from "./common/InfoCard";
 
 const Body = () => {
   const [isDataLoading, setIsDataLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+
   const [listOfRestaurants, setListOfRestaurants] = useState([]);
 
   // function to delay the execution
@@ -27,7 +26,6 @@ const Body = () => {
       setIsDataLoading(false);
     }
     catch(err){
-      setIsError(true)
       console.log(err)
     }
     finally{
@@ -38,18 +36,6 @@ const Body = () => {
 
   if (isDataLoading) {
     return <h1>Loading...</h1>;
-  }
-
-  if(isError){
-    return (
-      <div className="p-6">
-        <InfoCard
-          heading="Something went wrong"
-          description="Please try after sometime."
-          imageSrc="/images/contact.jpg"
-        />
-      </div>
-    );
   }
 
   return (
