@@ -1,40 +1,26 @@
 import Card from "./Card";
 import { useEffect, useState } from "react";
-import { API_URL, RESTURANTS } from "../utils/constants";
+import Switch from "@mui/material/Switch";
+import { API_URL } from "../utils/constants";
 
+const label = { inputProps: { "aria-label": "Switch demo" } };
 const Body = () => {
-  const [isDataLoading, setIsDataLoading] = useState(false);
-
   const [listOfRestaurants, setListOfRestaurants] = useState([]);
-
-  // function to delay the execution
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    try{
-      setIsDataLoading(true);
-      const data = await fetch(`${API_URL}${RESTURANTS}`);
-      const json = await data.json();
-      console.log(json);
-      setListOfRestaurants(
-        json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
-      );
-      setIsDataLoading(false);
-    }
-    catch(err){
-      console.log(err)
-    }
-    finally{
-      setIsDataLoading(false);
-    }
-    
+    const data = await fetch(`${API_URL}/restaurants`);
+    const json = await data.json();
+    console.log(json);
+    setListOfRestaurants(
+      json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
+    );
   };
 
-  if (isDataLoading) {
+  if (listOfRestaurants.length === 0) {
     return <h1>Loading...</h1>;
   }
 
@@ -47,9 +33,14 @@ const Body = () => {
             type="text"
             placeholder="Search"
           />
-          {/* <Switch {...label} color="secondary" /> */}
+          <Switch {...label} color="secondary" />
           <button
-            onClick={ () => handleClick(listOfRestaurants)}
+            onClick={(listOfRestaurants) => {
+              const filteredResList = resList.filter(
+                (res) => res.info.avgRating >= 4
+              );
+              setListOfRestaurants(filteredResList);
+            }}
             className="mx-2 hover:cursor-pointer bg-gray-200 hover:bg-gray-600 hover:text-white font-semibold py-2 px-4 rounded"
           >
             Best Rated
@@ -65,10 +56,4 @@ const Body = () => {
     </>
   );
 };
-
-function handleClick(listOfRestaurants){
-  const filteredResList = resList.filter((res) => res.info.avgRating >= 4);
-  setListOfRestaurants(filteredResList);
-  return filteredResList;
-}
 export default Body;
