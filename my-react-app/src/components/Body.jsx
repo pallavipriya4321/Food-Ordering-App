@@ -6,6 +6,9 @@ import { API_URL } from "../utils/constants";
 const label = { inputProps: { "aria-label": "Switch demo" } };
 const Body = () => {
   const [listOfRestaurants, setListOfRestaurants] = useState([]);
+  const [searchText, setSearchText] = useState("Search");
+  const [originialList, setOriginialList] = useState([]);
+  const [match, setMatch] = useState(true);
 
   useEffect(() => {
     fetchData();
@@ -16,6 +19,9 @@ const Body = () => {
     const json = await data.json();
     console.log(json);
     setListOfRestaurants(
+      json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
+    );
+    setOriginialList(
       json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
     );
   };
@@ -31,13 +37,35 @@ const Body = () => {
           <input
             className="shadow appearance-none border rounded py-1 px-2 mx-3 text-gray-700 cursor-pointer"
             type="text"
-            placeholder="Search"
+            value={searchText}
+            onClick={() => {
+              setSearchText("");
+            }}
+            onChange={(e) => {
+              setSearchText(e.target.value);
+              const filteredResList = originialList.filter((res) =>
+                res.info.name
+                  .toLowerCase()
+                  .includes(e.target.value.toLowerCase())
+              );
+
+              // searchText === "" && searchText === "Search";
+
+              filteredResList?.length > 0
+                ? setListOfRestaurants(filteredResList)
+                : setListOfRestaurants(originialList);
+              filteredResList?.length > 0 ? setMatch(true) : setMatch(false);
+
+              console.log(filteredResList);
+            }}
           />
+
           <Switch {...label} color="secondary" />
+
           <button
-            onClick={(listOfRestaurants) => {
-              const filteredResList = resList.filter(
-                (res) => res.info.avgRating >= 4
+            onClick={() => {
+              const filteredResList = originialList.filter(
+                (res) => res.info.avgRating >= 4.5
               );
               setListOfRestaurants(filteredResList);
             }}
@@ -45,6 +73,9 @@ const Body = () => {
           >
             Best Rated
           </button>
+        </div>
+        <div className="flex justify-center mt-5">
+          <h5>{match ? "" : "No Restaurants Found"}</h5>
         </div>
 
         <div className="mt-10 ml-8 mr-8 grid grid-cols-4 gap-2">
