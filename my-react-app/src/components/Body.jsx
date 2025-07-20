@@ -2,6 +2,7 @@ import Card from "./Card";
 import { useEffect, useState } from "react";
 import Switch from "@mui/material/Switch";
 import { API_URL } from "../utils/constants";
+import { Link } from "react-router-dom";
 
 const label = { inputProps: { "aria-label": "Switch demo" } };
 const Body = () => {
@@ -78,9 +79,11 @@ const Body = () => {
           <h5>{match ? "" : "No Restaurants Found"}</h5>
         </div>
 
-        <div className="mt-10 ml-8 mr-8 grid grid-cols-4 gap-2">
+        <div className=" mt-10 ml-8 mr-8 grid grid-cols-4 gap-2">
           {listOfRestaurants.map((restaurant) => (
-            <Card key={restaurant.info.id} resData={restaurant} />
+            <Link to={"restaurants/" + restaurant.info.id}>
+              <Card key={restaurant.info.id} resData={restaurant} />
+            </Link>
           ))}
         </div>
       </div>
