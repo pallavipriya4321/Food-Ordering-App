@@ -7,6 +7,7 @@ import App from "./App.jsx";
 import Body from "./components/Body.jsx";
 import Contact from "./components/Contact.jsx";
 import Error from "./components/Error.jsx";
+import Cart from "./components/Cart.jsx";
 
 const appRouter = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const appRouter = createBrowserRouter([
         path: "/contact",
         element: <Contact />,
         errorElement: <Error />,
+      },
+      {
+        path: "/cart",
+        element: <Cart />,
       },
     ],
   },
