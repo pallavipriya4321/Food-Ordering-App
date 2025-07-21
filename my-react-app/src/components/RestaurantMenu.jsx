@@ -3,6 +3,7 @@ import { API_URL } from "../utils/constants";
 import { CDN_URL } from "../utils/constants";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import Dish from "./Dish.jsx";
 
 const RestaurantMenu = () => {
   const [MenuData, setMenuData] = useState(null);
@@ -53,12 +54,15 @@ const RestaurantMenu = () => {
     ?.flatMap((cat) => cat.card?.card?.categories || [])
     ?.flatMap((category) => category.itemCards || []);
 
+  console.log(allItemCards);
+  console.log(nestedCategories);
+
   //   console.log(MenuCards[2].card.info.name);
 
   return (
     <>
-      <div className="flex flex-col items-center bg-white p-10">
-        <div className="w-2/3 flex flex-col bg-gray-100 shadow-lg p-3 rounded-3xl">
+      <div className="flex flex-col items-center bg-white p-5 mt-5 rounded-3xl shadow-2xl">
+        <div className="w-2/3 flex flex-col bg-gray-100 shadow-lg p-3 rounded-3xl mb-5">
           <h1 className="font-bold text-3xl ml-3 mt-3">{name}</h1>
           <div className="flex flex-row p-5 h-40 font-bold bg-white rounded-4xl justify-between shadow-2xl m-3">
             <div className="flex flex-col">
@@ -89,14 +93,15 @@ const RestaurantMenu = () => {
             </div>
           </div>
         </div>
-        <ul className="list-disc ml-6 mt-4">
-          {allItemCards?.map((item) => (
-            <li key={item.card.info.id}>
-              {item.card.info.name}-{" Rs "}
-              {item.card.info.price / 100}
-            </li>
-          ))}
-        </ul>
+
+        {allItemCards?.map((item) => (
+          <Dish
+            key={item.card.info.id}
+            DishData={item.card.info}
+            //   {item.card.info.name}-{" Rs "}
+            //   {item.card.info.price / 100}
+          />
+        ))}
       </div>
     </>
   );
