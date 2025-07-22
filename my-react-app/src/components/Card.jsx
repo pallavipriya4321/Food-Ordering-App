@@ -1,4 +1,6 @@
 import { CDN_URL } from "../utils/constants";
+import Ratings from "../components/commonComponents/Ratings";
+
 
 const Card = (props) => {
   const { resData } = props;
@@ -18,7 +20,7 @@ const Card = (props) => {
         <div className="flex text-sm justify-between">
           <h6 className="text-sm">{sla.deliveryTime} mins</h6>
           <h6 className="text-sm">{costForTwo}</h6>
-          <h6>{avgRating}</h6>
+          <Ratings>{avgRating}</Ratings>
         </div>
       </div>
     </>
