@@ -1,28 +1,17 @@
 import React, { useState } from "react";
-import { API_URL } from "../utils/constants";
 import { CDN_URL } from "../utils/constants";
+import RestaurantCategory from "./RestaurantCategory";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import useRestaurantMenu from "../utils/useRestaurantmenu.jsx";
 import Dish from "./Dish.jsx";
 
 const RestaurantMenu = () => {
-  const [MenuData, setMenuData] = useState(null);
-
   const { resid } = useParams();
-  console.log(resid);
+  const resInfo = useRestaurantMenu(resid);
+  // console.log(resid);
 
-  useEffect(() => {
-    fetchMenuData();
-  }, [resid]);
-
-  const fetchMenuData = async () => {
-    const data = await fetch(`${API_URL}/restaurants/${resid}`);
-    const json = await data.json();
-    console.log(json);
-    setMenuData(json.data);
-  };
-
-  if (!MenuData) {
+  if (!resInfo || !resInfo.cards || !resInfo.cards[2]) {
     return <h1>Loading...</h1>;
   }
 
@@ -34,37 +23,54 @@ const RestaurantMenu = () => {
     sla,
     cloudinaryImageId,
     totalRatingsString,
-  } = MenuData?.cards[2]?.card?.card?.info;
-
-  //   console.log(
-  //     MenuData?.cards?.[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards?.[1]?.card
-  //       ?.card?.categories[0]?.itemCards[1]?.card?.info?.name
-  //   );
+  } = resInfo?.cards[2]?.card?.card?.info;
 
   const regularCards =
-    MenuData?.cards?.[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards;
+    resInfo?.cards?.[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards;
 
-  const nestedCategories = regularCards?.filter(
-    (c) =>
-      c.card?.card?.["@type"] ===
-      "type.googleapis.com/swiggy.presentation.food.v2.NestedItemCategory"
-  );
+  // Filter both NestedItemCategory and ItemCategory
+  const itemCategories = regularCards?.filter((c) => {
+    const type = c.card?.card?.["@type"];
+    return (
+      type ===
+        "type.googleapis.com/swiggy.presentation.food.v2.NestedItemCategory" ||
+      type === "type.googleapis.com/swiggy.presentation.food.v2.ItemCategory"
+    );
+  });
 
-  const allItemCards = nestedCategories
-    ?.flatMap((cat) => cat.card?.card?.categories || [])
-    ?.flatMap((category) => category.itemCards || []);
+  // Extract all itemCards
+  const allItemCards = itemCategories?.flatMap((category) => {
+    if (category.card?.card?.categories) {
+      // For NestedItemCategory
+      return category.card.card.categories.flatMap(
+        (cat) => cat.itemCards || []
+      );
+    } else {
+      // For ItemCategory
+      return category.card.card.itemCards || [];
+    }
+  });
 
-  console.log(allItemCards);
-  console.log(nestedCategories);
+  const uniqueItemCards = [];
+  const seen = new Set();
 
-  //   console.log(MenuCards[2].card.info.name);
+  allItemCards.forEach((item) => {
+    const id = item?.card?.info?.id;
+    if (id && !seen.has(id)) {
+      seen.add(id);
+      uniqueItemCards.push(item);
+    }
+  });
+
+  // console.log(allItemCards);
+  console.log(itemCategories);
 
   return (
     <>
       <div className="flex flex-col items-center bg-white p-5 mt-5 rounded-3xl shadow-2xl">
         <div className="w-2/3 flex flex-col bg-gray-100 shadow-lg p-3 rounded-3xl mb-5">
           <h1 className="font-bold text-3xl ml-3 mt-3">{name}</h1>
-          <div className="flex flex-row p-5 h-40 font-bold bg-white rounded-4xl justify-between shadow-2xl m-3">
+          <div className="flex flex-row p-5 h-40 font-bold bg-white rounded-2xl justify-between shadow-2xl m-3">
             <div className="flex flex-col">
               <div className="flex flex-row">
                 <h2>✮ {avgRating} </h2>
@@ -94,14 +100,17 @@ const RestaurantMenu = () => {
           </div>
         </div>
 
-        {allItemCards?.map((item) => (
-          <Dish
-            key={item.card.info.id}
-            DishData={item.card.info}
-            //   {item.card.info.name}-{" Rs "}
-            //   {item.card.info.price / 100}
+        {itemCategories.map((category) => (
+          <RestaurantCategory
+            key={category?.card?.card?.categoryId}
+            category={category.card.card}
+            uniqueItemCards={uniqueItemCards}
           />
         ))}
+
+        {/* {uniqueItemCards?.map((item) => (
+          <Dish key={item.card.info.id} DishData={item.card.info} />
+        ))} */}
       </div>
     </>
   );

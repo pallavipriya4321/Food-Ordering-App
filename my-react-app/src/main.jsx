@@ -1,14 +1,16 @@
-import { StrictMode } from "react";
+import { StrictMode, Suspense, lazy } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import About from "./components/About.jsx";
 import App from "./App.jsx";
 import Body from "./components/Body.jsx";
-import Contact from "./components/Contact.jsx";
 import Error from "./components/Error.jsx";
-import Cart from "./components/Cart.jsx";
 import RestaurantMenu from "./components/RestaurantMenu.jsx";
+
+const About = lazy(() => import("./components/About.jsx"));
+const Contact = lazy(() => import("./components/Contact.jsx"));
+const Cart = lazy(() => import("./components/Cart.jsx"));
+// const RestaurantMenu = lazy(() => import("./components/RestaurantMenu.jsx"));
 
 const appRouter = createBrowserRouter([
   {
@@ -22,17 +24,29 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "/about",
-        element: <About />,
+        element: (
+          <Suspense fallback={<h1>Loading...</h1>}>
+            <About />
+          </Suspense>
+        ),
         errorElement: <Error />,
       },
       {
         path: "/contact",
-        element: <Contact />,
+        element: (
+          <Suspense fallback={<h1>Loading...</h1>}>
+            <Contact />
+          </Suspense>
+        ),
         errorElement: <Error />,
       },
       {
         path: "/cart",
-        element: <Cart />,
+        element: (
+          <Suspense fallback={<h1>Loading...</h1>}>
+            <Cart />
+          </Suspense>
+        ),
       },
       {
         path: "/restaurants/:resid",

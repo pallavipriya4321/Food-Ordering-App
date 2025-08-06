@@ -11,6 +11,8 @@ const Body = () => {
   const [originialList, setOriginialList] = useState([]);
   const [match, setMatch] = useState(true);
 
+  console.log(listOfRestaurants);
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -20,10 +22,10 @@ const Body = () => {
     const json = await data.json();
     console.log(json);
     setListOfRestaurants(
-      json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
+      json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants
     );
     setOriginialList(
-      json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants
+      json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants
     );
   };
 
@@ -79,10 +81,13 @@ const Body = () => {
           <h5>{match ? "" : "No Restaurants Found"}</h5>
         </div>
 
-        <div className=" mt-10 ml-8 mr-8 grid grid-cols-4 gap-2">
+        <div className=" mt-10 ml-8 mr-8 grid grid-cols-4 gap-2 mb-5">
           {listOfRestaurants.map((restaurant) => (
-            <Link to={"restaurants/" + restaurant.info.id}>
-              <Card key={restaurant.info.id} resData={restaurant} />
+            <Link
+              key={restaurant.info.id}
+              to={"restaurants/" + restaurant.info.id}
+            >
+              <Card resData={restaurant} />
             </Link>
           ))}
         </div>
